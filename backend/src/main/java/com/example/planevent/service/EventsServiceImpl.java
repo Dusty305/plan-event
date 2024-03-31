@@ -1,8 +1,8 @@
 package com.example.planevent.service;
 
-import com.example.planevent.dto.EventDTO;
-import com.example.planevent.dto.PointDTO;
-import com.example.planevent.dto.TaskDTO;
+import com.example.planevent.controller.dto.EventDTO;
+import com.example.planevent.controller.dto.PointDTO;
+import com.example.planevent.controller.dto.TaskDTO;
 import com.example.planevent.entity.Event;
 import com.example.planevent.entity.Task;
 import com.example.planevent.entity.User;
@@ -33,15 +33,12 @@ public class EventsServiceImpl implements EventsService {
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     @Override
-    public List<Event> getAllEventsByUsername(String username) {
-        User user = userRepository.findByUsername(username).get();
+    public List<Event> getAllEventsByUser(User user) {
         return eventsRepository.findAllByUser(user);
     }
 
     @Override
-    public List<Event> getAllYearEventsByUsername(String username, int year) {
-        User user = userRepository.findByUsername(username).get();
-
+    public List<Event> getAllYearEventsByUser(User user, int year) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
 
@@ -56,9 +53,7 @@ public class EventsServiceImpl implements EventsService {
     }
 
     @Override
-    public List<Event> getAllMonthEventsByUsername(String username, int year, int month) {
-        User user = userRepository.findByUsername(username).get();
-
+    public List<Event> getAllMonthEventsByUser(User user, int year, int month) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, month);
@@ -73,9 +68,7 @@ public class EventsServiceImpl implements EventsService {
     }
 
     @Override
-    public List<Event> getAllWeekEventsByUsername(String username, int year, int month, int week) {
-        User user = userRepository.findByUsername(username).get();
-
+    public List<Event> getAllWeekEventsByUser(User user, int year, int month, int week) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(Calendar.YEAR, year);
         calendar.set(Calendar.MONTH, month);
@@ -91,7 +84,7 @@ public class EventsServiceImpl implements EventsService {
     }
 
     @Override
-    public boolean updateEventByUsername(Event updatedEvent, String username) {
+    public boolean updateEventByUser(Event updatedEvent, User user) {
         Long updatedEventID = updatedEvent.getId();
         Event oldEvent = eventsRepository.findById(updatedEventID).orElse(null);
         if (oldEvent == null)

@@ -1,11 +1,15 @@
 package com.example.planevent.controller;
 
-import com.example.planevent.dto.EventDTO;
-import com.example.planevent.dto.PointDTO;
-import com.example.planevent.dto.TaskDTO;
+import com.example.planevent.controller.dto.EventDTO;
+import com.example.planevent.controller.dto.PointDTO;
+import com.example.planevent.controller.dto.TaskDTO;
 import com.example.planevent.entity.Event;
 import com.example.planevent.entity.Task;
+import com.example.planevent.entity.User;
+import com.example.planevent.mapper.EventMapper;
+import com.example.planevent.mapper.TaskMapper;
 import com.example.planevent.service.EventsService;
+import com.example.planevent.service.UserService;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
@@ -24,19 +28,28 @@ public class EventsController {
     @Autowired
     private EventsService eventsService;
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private EventMapper eventMapper;
+
+    @Autowired
+    private TaskMapper taskMapper;
+
     @GetMapping
     public List<EventDTO> getAllEvents(@AuthenticationPrincipal UserDetails userDetails) {
-        String username = userDetails.getUsername();
-        List<Event> events = eventsService.getAllEventsByUsername(username);
-        return events.stream().map(EventDTO::new).collect(Collectors.toList());
+        User user = userService.getUserByUsername(userDetails.getUsername());
+        List<Event> events = eventsService.getAllEventsByUser(user);
+        return eventMapper.eventsToEventDtos(events);
     }
 
     @PostMapping("/update_event")
     public ResponseEntity<?> updateEvent(@AuthenticationPrincipal UserDetails userDetails,
                                          @RequestBody EventDTO eventDTO) {
-        String username = userDetails.getUsername();
+        User user = userService.getUserByUsername(userDetails.getUsername());
         Event event = convertToEvent(eventDTO);
-        if(eventsService.updateEventByUsername(event, username))
+        if(eventsService.updateEventByUser(event, user))
             return ResponseEntity.ok().build();
         else
             return ResponseEntity.badRequest().build();
@@ -54,8 +67,9 @@ public class EventsController {
     @PostMapping("/save_event")
     public ResponseEntity<?> saveEvent(@AuthenticationPrincipal UserDetails userDetails,
                                        @RequestBody EventDTO eventDTO) {
-        String username = userDetails.getUsername();
-        if(eventsService.saveEventByUsername(eventDTO, username))
+        User user = userService.getUserByUsername(userDetails.getUsername());
+        Event event = eventMapper.eventDTOtoEvent(eventDTO);
+        if(eventsService.saveEventByUser(event, user))
             return ResponseEntity.ok().build();
         else
             return ResponseEntity.badRequest().build();
@@ -64,7 +78,9 @@ public class EventsController {
     @PostMapping("/save_task")
     public ResponseEntity<?> saveTask(@AuthenticationPrincipal UserDetails userDetails,
                                        @RequestBody TaskDTO taskDTO) {
-        if(eventsService.saveTaskByEvent(taskDTO))
+        User user = userService.getUserByUsername(userDetails.getUsername());
+        Task task = taskMapper.taskDtoToTask(taskDTO);
+        if(eventsService.saveTaskByUser(task, user))
             return ResponseEntity.ok().build();
         else
             return ResponseEntity.badRequest().build();

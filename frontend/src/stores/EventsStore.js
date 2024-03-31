@@ -5,6 +5,32 @@ import {useUserStore} from "./UserStore.js";
 import {incrementWeek} from "../util/dateUtils.js";
 
 const _EVENTS_API = 'events'
+let testingEvents = [
+    {
+        name: 'Event #1',
+        description: 'Description #2',
+        start: new Date(),
+        end: incrementWeek(new Date()),
+        color: '#00FFFF',
+        location: {
+            longitude: -0.09,
+            latitude: 51.505,
+            address: 'Address, City'
+        } 
+    },
+    {
+        name: 'Event #2',
+        description: 'Description #2',
+        start: new Date(),
+        end: incrementWeek(new Date()),
+        color: '#000FFF',
+        location: {
+            longitude: 30.324639475,
+            latitude: 59.93446385,
+            address: 'Kazanskiy Sobor, Saint-Petersburg'
+        }
+    }
+]
 
 export const useEventsStore = defineStore("events", () => {
     const events = ref([])
@@ -12,6 +38,7 @@ export const useEventsStore = defineStore("events", () => {
 
     const refreshEvents = async () => {
         refreshing.value = true
+
         let response = await fetch(`${BASE_API_URL}/${_EVENTS_API}`, {
             method: 'GET',
             mode: "cors",
@@ -25,10 +52,19 @@ export const useEventsStore = defineStore("events", () => {
         else {
             console.log("Не удалось получить мероприятия с сервера")
         }
+
         refreshing.value = false
-        console.log(events.value)
-        return response
+        return response.ok
     }
+
+    /*
+    const refreshEvents = async () => {
+        refreshing.value = true
+        events.value = testingEvents
+        refreshing.value = false
+        return true
+    }
+    */
 
     const _objToEvent = (event) => ({
         ...event,

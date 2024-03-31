@@ -62,6 +62,13 @@ export const useUserStore = defineStore('user', () => {
         return response.ok
     }
 
+    /*
+    const validateJWT = async () => {
+        authorized.value = true
+        return true
+    }
+    */
+
     return {
         authorized: readonly(authorized),
         jwt,
