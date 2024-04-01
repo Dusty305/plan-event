@@ -47,6 +47,7 @@ export const useUserStore = defineStore('user', () => {
         authorized.value = false
     }
 
+    /*
     const validateJWT = async () => {
         const localStorageJWT = localStorage.getItem(_LOCAL_STORAGE_JWT_KEY)
         let response = await fetch(`${BASE_API_URL}/${_AUTH_API}/test`, {
@@ -61,13 +62,13 @@ export const useUserStore = defineStore('user', () => {
         }
         return response.ok
     }
+     */
 
-    /*
     const validateJWT = async () => {
         authorized.value = true
         return true
     }
-    */
+
 
     return {
         authorized: readonly(authorized),

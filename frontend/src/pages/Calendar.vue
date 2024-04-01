@@ -63,9 +63,12 @@ const calendarOptions = ref({
   initialDate: initialDate,
   // actions
   eventClick: (info) => {
+    console.log(info)
     const rect = info.el.getBoundingClientRect()
+    console.log(rect)
     eventCardPosition.value = calculatePositionFromRect(rect)
     selectedEvent.value = eventsStore.getEventById(info.event.id)
+    console.log(selectedEvent.value)
   }
 })
 

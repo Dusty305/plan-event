@@ -7,6 +7,7 @@ import {incrementWeek} from "../util/dateUtils.js";
 const _EVENTS_API = 'events'
 let testingEvents = [
     {
+        id: 1,
         name: 'Event #1',
         description: 'Description #2',
         start: new Date(),
@@ -19,6 +20,7 @@ let testingEvents = [
         } 
     },
     {
+        id: 2,
         name: 'Event #2',
         description: 'Description #2',
         start: new Date(),
@@ -36,6 +38,7 @@ export const useEventsStore = defineStore("events", () => {
     const events = ref([])
     const refreshing = ref(false)
 
+    /*
     const refreshEvents = async () => {
         refreshing.value = true
 
@@ -56,15 +59,16 @@ export const useEventsStore = defineStore("events", () => {
         refreshing.value = false
         return response.ok
     }
+     */
 
-    /*
+
     const refreshEvents = async () => {
         refreshing.value = true
         events.value = testingEvents
         refreshing.value = false
         return true
     }
-    */
+
 
     const _objToEvent = (event) => ({
         ...event,
