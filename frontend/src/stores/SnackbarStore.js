@@ -7,8 +7,8 @@ export const useSnackbarStore = defineStore("snackbar", () => {
     const _snackbar = ref(false)
 
     const snackbar = computed(() => _snackbar.value)
-    const text = ref('')
-    const color = ref('')
+    const _text = ref('')
+    const _color = ref('')
 
     const INFO_COLOR = 'info'
     const SUCCESS_COLOR = 'success'
@@ -16,15 +16,10 @@ export const useSnackbarStore = defineStore("snackbar", () => {
     const ERROR_COLOR = 'error'
 
     const showSnackbar = (text, color) => {
-        if (text && text instanceof String) {
-            text.value = text
-        }
-        if (color && [INFO_COLOR, SUCCESS_COLOR, WARNING_COLOR, ERROR_COLOR].includes(color)) {
-            color.value = color
-        }
-        if (_timeoutID.value) {
-            clearTimeout(_timeoutID.value)
-        }
+        _text.value = text ? text : _text.value
+        _color.value = color ? color : _color.value
+        _clearTimeout()
+
         _snackbar.value = true
         _timeoutID.value = setTimeout(() => {
                 _snackbar.value = false
@@ -34,14 +29,20 @@ export const useSnackbarStore = defineStore("snackbar", () => {
         )
     }
 
+    const _clearTimeout = () => {
+        if (_timeoutID.value) {
+            clearTimeout(_timeoutID.value)
+        }
+    }
+
     return {
         INFO_COLOR,
         SUCCESS_COLOR,
         WARNING_COLOR,
         ERROR_COLOR,
         snackbar,
-        text,
-        color,
+        text: _text,
+        color: _color,
         showSnackbar
     }
 })

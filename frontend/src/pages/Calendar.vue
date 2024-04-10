@@ -7,6 +7,9 @@ import {useEventsStore} from "../stores/EventsStore.js";
 import {storeToRefs} from "pinia";
 import {useCalendarStore} from "../stores/CalendarStore.js";
 import EventCard from "../components/cards/EventCard.vue";
+import {useSnackbarStore} from "@/stores/SnackbarStore.js";
+
+const emit = defineEmits(['edit-event'])
 
 //
 // Pinia stores
@@ -72,6 +75,11 @@ const calendarOptions = ref({
   }
 })
 
+const handleMapBtnClicked = () => {
+  const snackbarStore = useSnackbarStore()
+  snackbarStore.showSnackbar('Функционал в разработке', snackbarStore.INFO_COLOR)
+}
+
 //
 // Watchers and hooks
 //
@@ -84,7 +92,7 @@ onBeforeMount(async () => {
 })
 watch(fullCalendarView, () => api.changeView(fullCalendarView.value))
 watch(date, () => api.gotoDate(date.value))
-watch(events, async () => {
+watch(events, () => {
   api.removeAllEventSources()
   api.addEventSource(events)
 })
@@ -100,6 +108,8 @@ watch(events, async () => {
       v-if="selectedEvent"
       :event="selectedEvent"
       :style="cardStyle"
-      @edit-btn-clicked="handle"
+      @edit-btn-clicked="emit('edit-event', selectedEvent.id)"
+      @close-card="selectedEvent = null"
+      @map-btn-clicked="handleMapBtnClicked"
   />
 </template>

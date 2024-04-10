@@ -7,6 +7,8 @@ import CalendarViewMenu from "./components/toolbar/CalendarViewMenu.vue";
 import AuthTabbedSheet from "./components/dialogs/auth/AuthTabbedSheet.vue";
 import {onBeforeMount} from "vue";
 import EditEventCard from "./components/dialogs/edit-cards/EditEventCard.vue";
+import {router} from "@/router/index.js";
+import {useEventsStore} from "@/stores/EventsStore.js";
 
 //
 // Pinia stores
@@ -23,7 +25,11 @@ const { snackbar, color, text } = storeToRefs(snackbarStore)
 //
 
 const addEventDialog = ref(false)
-const addTaskDialog = ref(false)
+//const addTaskDialog = ref(false)
+const editEventDialog = ref(false)
+const editEventId = ref(null)
+//const editTaskDialog = ref(false)
+//const editTaskId = ref(false)
 const authDialog = ref(false)
 
 //
@@ -40,8 +46,20 @@ const logButtonPressed = () => {
   }
 }
 
+//
+// Router button
+//
+
+const routerBtnText = computed(() => router.currentRoute.value.name === 'calendar' ? 'Карта' : 'Календарь')
+const routerBtnIcon = computed(() => routerBtnText.value === 'Карта' ? 'mdi-map' : 'mdi-calendar')
+const handleRouterBtnClicked = () => router.push(routerBtnText.value === 'Карта' ? 'map' : 'calendar')
+
+
 onBeforeMount(async () => {
   await useUserStore().validateJWT()
+})
+onBeforeMount(async () => {
+  await useEventsStore().refreshEvents()
 })
 </script>
 
@@ -53,15 +71,16 @@ onBeforeMount(async () => {
         <calendar-view-menu/>
         <v-btn icon="mdi-arrow-right" class="mr-1" fab @click="calendarStore.increment"/>
       </v-app-bar-title>
-      <v-btn
+      <!--v-btn
           :prepend-icon="userStore.authorized ? 'mdi-logout' : 'mdi-login'"
           :text="userStore.authorized ? 'Выйти' : 'Войти'"
           @click="logButtonPressed"
-      >
+      /-->
+      <v-btn :prepend-icon="routerBtnIcon" :text="routerBtnText" @click="handleRouterBtnClicked">
       </v-btn>
     </v-app-bar>
     <v-main>
-      <router-view/>
+      <router-view @edit-event="(id) => { editEventId = id; editEventDialog = true }"/>
       <v-menu location="right">
         <template v-slot:activator="{ props }">
           <v-btn
@@ -76,7 +95,7 @@ onBeforeMount(async () => {
         </template>
         <v-list>
           <v-list-item title="Add event" @click="addEventDialog = true"/>
-          <v-list-item title="Add task" @click="addTaskDialog = true"/>
+          <v-list-item title="Add task" @click="addEventDialog = true"/>
         </v-list>
       </v-menu>
       <v-snackbar v-model="snackbar" :text="text" :color="color"/>
@@ -85,11 +104,17 @@ onBeforeMount(async () => {
             :new-event="true"
             @close-card="addEventDialog = false"/>
       </v-dialog>
-      <v-dialog v-model="addTaskDialog">
+      <v-dialog v-model="editEventDialog">
+        <EditEventCard
+            :event-id="editEventId"
+            @close-card="editEventDialog = false; editEventId = null;"
+        />
+      </v-dialog>
+      <!--v-dialog v-model="addTaskDialog">
         <EditEventCard
             :new-event="true"
             @close-card="addTaskDialog = false"/>
-      </v-dialog>
+      </v-dialog-->
       <v-dialog v-model="authDialog">
         <AuthTabbedSheet @close-dialog="authDialog = false"/>
       </v-dialog>

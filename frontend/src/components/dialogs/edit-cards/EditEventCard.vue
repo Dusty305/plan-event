@@ -15,7 +15,7 @@ const props = defineProps({
   },
   eventId: {
     validator(value, props) {
-      if (props.newEvent) {
+      if (!props.newEvent) {
         return value instanceof Number
       }
     }
@@ -57,7 +57,7 @@ const handleCancelBtnClick = () => {
 
 const saveEvent = async () => {
   let response = await eventsStore.saveEvent(event.value)
-  if (response.ok) {
+  if (response) {
     snackbarStore.showSnackbar('Мероприятие было добавлено', snackbarStore.SUCCESS_COLOR)
     emit('closeCard')
   }
@@ -68,7 +68,7 @@ const saveEvent = async () => {
 
 const updateEvent = async () => {
   let response = await eventsStore.updateEventDataByID(props.eventId, event.value)
-  if (response.ok) {
+  if (response) {
     snackbarStore.showSnackbar('Мероприятие было обновлено', snackbarStore.SUCCESS_COLOR)
     emit('closeCard')
   }
@@ -82,6 +82,8 @@ const updateEvent = async () => {
 //
 
 onBeforeMount(() => {
+  console.log(props.newEvent)
+  console.log(props.eventId)
   if (props.newEvent) {
     event.value = eventsStore.generateNewEvent()
   }

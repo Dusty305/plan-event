@@ -5,6 +5,42 @@ import {BASE_API_URL} from "../main.js";
 const _AUTH_API = 'auth'
 const _LOCAL_STORAGE_JWT_KEY = 'jwt'
 
+//
+// Store for GH Pages
+//
+
+export const useUserStore = defineStore('user', () => {
+    const authorized = ref(true)
+    const jwt = computed(() => {
+        if (authorized.value) {
+            return `Bearer ${localStorage.getItem(_LOCAL_STORAGE_JWT_KEY)}`
+        }
+    })
+
+    const authorizeUser = async (user) => { }
+
+    const registerUser = async (user) => { }
+
+    const logoutUser = () => { }
+
+    const validateJWT = async () => { }
+
+    return {
+        authorized: readonly(authorized),
+        jwt,
+        validateJWT,
+        registerUser,
+        authorizeUser,
+        logoutUser
+    }
+})
+
+/*
+
+//
+// Store for production
+//
+
 export const useUserStore = defineStore('user', () => {
     const authorized = ref(false)
     const jwt = computed(() => {
@@ -47,7 +83,7 @@ export const useUserStore = defineStore('user', () => {
         authorized.value = false
     }
 
-    /*
+
     const validateJWT = async () => {
         const localStorageJWT = localStorage.getItem(_LOCAL_STORAGE_JWT_KEY)
         let response = await fetch(`${BASE_API_URL}/${_AUTH_API}/test`, {
@@ -62,7 +98,7 @@ export const useUserStore = defineStore('user', () => {
         }
         return response.ok
     }
-     */
+
 
     const validateJWT = async () => {
         authorized.value = true
@@ -79,3 +115,4 @@ export const useUserStore = defineStore('user', () => {
         logoutUser
     }
 })
+*/

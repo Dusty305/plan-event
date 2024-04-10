@@ -5,40 +5,104 @@ import {useUserStore} from "./UserStore.js";
 import {incrementWeek} from "../util/dateUtils.js";
 
 const _EVENTS_API = 'events'
-let testingEvents = [
-    {
-        id: 1,
-        name: 'Event #1',
-        description: 'Description #2',
-        start: new Date(),
-        end: incrementWeek(new Date()),
-        color: '#00FFFF',
-        location: {
-            longitude: -0.09,
-            latitude: 51.505,
-            address: 'Address, City'
-        } 
-    },
-    {
-        id: 2,
-        name: 'Event #2',
-        description: 'Description #2',
-        start: new Date(),
-        end: incrementWeek(new Date()),
-        color: '#000FFF',
-        location: {
-            longitude: 30.324639475,
-            latitude: 59.93446385,
-            address: 'Kazanskiy Sobor, Saint-Petersburg'
-        }
-    }
-]
+
+//
+// Store for GH Pages
+//
 
 export const useEventsStore = defineStore("events", () => {
     const events = ref([])
     const refreshing = ref(false)
 
-    /*
+    const refreshEvents = async () => {
+        refreshing.value = true
+        const eventsStr = localStorage.getItem('events')
+        if (!eventsStr) {
+            events.value = []
+            _loadEventsToLocalStorage()
+        }
+        else {
+            events.value = JSON.parse(eventsStr).map(_objToEvent)
+        }
+        refreshing.value = false
+        console.log(events.value)
+        return true
+    }
+
+    const updateEventDataByID = async (id, data) => {
+        const index = _getEventIndexById(id)
+        if (index === -1 || !data) {
+            return false
+        }
+        events.value[index] = { ...data }
+        _loadEventsToLocalStorage()
+        return true
+    }
+
+    const saveEvent = async (event) => {
+        events.value.push(event)
+        _loadEventsToLocalStorage()
+        return true
+    }
+
+    const generateNewEvent = () => ({
+        id: _generateId(),
+        name: '',
+        description: '',
+        start: new Date(),
+        end: incrementWeek(new Date()),
+        color: "#00FFFF",
+        location: {
+            address: null,
+            latitude: null,
+            longitude: null,
+        }
+    })
+
+    const getEventById = (id) => readonly(_getEventById(id))
+
+    const getEventCopyById = (id) => _objToEvent(JSON.parse(JSON.stringify(_getEventById(id))))
+
+    const _generateId = () => {
+        const l = events.value.length
+        return l > 0 ? events.value[l - 1].id + 1 : 0
+    }
+
+    const _loadEventsToLocalStorage = () => localStorage.setItem('events', JSON.stringify(events.value))
+
+    const _getEventIndexById = (id) => events.value.findIndex((event) => event.id == id)
+
+    const _getEventById = (id) => events.value[_getEventIndexById(id)]
+
+    const _objToEvent = (event) => ({
+        ...event,
+        start: new Date(event.start),
+        end: new Date(event.end),
+    })
+
+    return {
+        events: computed(() => events.value.map(event => ({ ...event, title: event.name }))),
+        refreshing,
+        saveEvent,
+        refreshEvents,
+        updateEventDataByID,
+        getEventById,
+        getEventCopyById,
+        generateNewEvent
+
+    }
+})
+
+/*
+
+//
+// Store for production
+//
+
+export const useEventsStore = defineStore("events", () => {
+    const events = ref([])
+    const refreshing = ref(false)
+
     const refreshEvents = async () => {
         refreshing.value = true
 
@@ -59,16 +123,6 @@ export const useEventsStore = defineStore("events", () => {
         refreshing.value = false
         return response.ok
     }
-     */
-
-
-    const refreshEvents = async () => {
-        refreshing.value = true
-        events.value = testingEvents
-        refreshing.value = false
-        return true
-    }
-
 
     const _objToEvent = (event) => ({
         ...event,
@@ -174,3 +228,4 @@ export const useEventsStore = defineStore("events", () => {
 
     }
 })
+*/
