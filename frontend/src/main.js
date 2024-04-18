@@ -34,6 +34,28 @@ import 'leaflet/dist/leaflet.css';
 
 
 //
+// Service worker
+//
+
+import {register} from "register-service-worker";
+
+register('plan-event/service-worker.js')
+
+/*
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(registration => {
+                console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(error => {
+                console.error('Service Worker registration failed:', error);
+            });
+    });
+}
+ */
+
+//
 // Constants
 //
 
