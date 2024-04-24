@@ -77,7 +77,7 @@ export const updateEvent = (event) => new Promise(async (resolve, reject) => {
 
     const transaction = db.transaction([EVENTS_STORE_NAME], 'readwrite');
     const store = transaction.objectStore(EVENTS_STORE_NAME);
-    const storeRequest = store.put(event, event.id)
+    const storeRequest = store.put(event)
 
     let response
     storeRequest.onsuccess = () => {

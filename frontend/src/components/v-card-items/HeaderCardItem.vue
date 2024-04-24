@@ -20,7 +20,6 @@ const onSurfaceColor = computed(() => {
   const red = Number(`0x${props.color.substring(1, 3)}`)
   const green = Number(`0x${props.color.substring(3, 5)}`)
   const blue = Number(`0x${props.color.substring(5, 7)}`)
-  console.log(`${red} ${green} ${blue}`)
   const threshold = red*0.299 + green*0.587 + blue*0.114 > 156
   return threshold ? '#000000' : '#FFFFFF'
 })

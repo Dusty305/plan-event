@@ -82,8 +82,6 @@ const updateEvent = async () => {
 //
 
 onBeforeMount(() => {
-  console.log(props.newEvent)
-  console.log(props.eventId)
   if (props.newEvent) {
     event.value = eventsStore.generateNewEvent()
   }

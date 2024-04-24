@@ -31,7 +31,6 @@ export const incrementMonth = (date) => {
     else {
         date.setMonth(date.getMonth() + 1)
     }
-    console.log(date)
     return new Date(date)
 }
 export const incrementWeek = (date) => {

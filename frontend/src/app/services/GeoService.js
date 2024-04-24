@@ -28,7 +28,6 @@ export const reverseAddressNameByLatLong = async (latitude, longitude) => {
     if (!reverseGeoCode) {
         return undefined
     }
-    console.log(reverseGeoCode)
     const nameDetails = reverseGeoCode['namedetails']
     if (!nameDetails || Object.keys(nameDetails).length === 0) {
         return reverseGeoCode['result']._text
@@ -50,7 +49,6 @@ export const reverseAddressPartsByLatLong = async (latitude, longitude) => {
     if (!reverseGeoCode) {
         return undefined
     }
-    console.log(reverseGeoCode)
     const address = reverseGeoCode['addressparts']
 
     const country = address['country']._text

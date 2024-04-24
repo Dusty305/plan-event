@@ -63,7 +63,7 @@ export const useEventsStore = defineStore("events", () => {
     // TODO: complete 'todo' above and remove the method
     const _updateEvent = async (event) => {
         return await fetch(`${API_URL}/update_event`, {
-            method: 'GET',
+            method: 'POST',
             mode: 'cors',
             body: JSON.stringify(event),
             headers: new Headers({
@@ -126,8 +126,9 @@ export const useEventsStore = defineStore("events", () => {
     }
 
     const getEventCopyById = (id) => {
-        const event = _getEventById();
-        return JSON.parse(JSON.stringify(event))
+        const event = _getEventById(id);
+        const rawEvent = JSON.parse(JSON.stringify(event))
+        return _objToEvent(rawEvent)
     }
 
     const generateNewEvent = () => ({
