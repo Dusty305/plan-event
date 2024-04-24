@@ -32,28 +32,24 @@ const pinia = createPinia()
 
 import 'leaflet/dist/leaflet.css';
 
-
 //
 // Service worker
 //
 
-import {register} from "register-service-worker";
-
-register('plan-event/service-worker.js')
-
-/*
 if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-            .then(registration => {
-                console.log('Service Worker registered with scope:', registration.scope);
-            })
-            .catch(error => {
-                console.error('Service Worker registration failed:', error);
-            });
-    });
+  window.addEventListener('load', async () => {
+    try {
+      const registration = await navigator.serviceWorker.register(
+          '/service-worker.js',
+          { type: (import.meta.env?.DEV ? 'module' : undefined) }
+      );
+      await registration.update();
+      console.log('Service worker registered!', registration);
+    } catch(err) {
+      console.log('Service worker registration failed', err);
+    }
+  })
 }
- */
 
 //
 // Constants

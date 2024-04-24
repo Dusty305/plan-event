@@ -15,23 +15,28 @@ export const useEventsStore = defineStore("events", () => {
 
     const refreshEvents = async () => {
         refreshing.value = true
-
-        let response = await fetch(`${API_URL}`, {
-            method: 'GET',
-            mode: "cors",
-            headers: new Headers({
-                'Authorization': useUserStore().jwt
+        try {
+            let response = await fetch(`${API_URL}`, {
+                method: 'GET',
+                mode: "cors",
+                headers: new Headers({
+                    'Authorization': useUserStore().jwt
+                })
             })
-        })
-        if (response.ok) {
-            events.value = (await response.json()).map(_objToEvent)
+            if (response.ok) {
+                events.value = (await response.json()).map(_objToEvent)
+            }
+            else {
+                console.log("Не удалось получить мероприятия с сервера")
+            }
+            return response.ok
+        } catch (err) {
+            console.log('Events store error: ', err)
+            refreshing.value = false
+            return false
+        } finally {
+            refreshing.value = false
         }
-        else {
-            console.log("Не удалось получить мероприятия с сервера")
-        }
-
-        refreshing.value = false
-        return response.ok
     }
 
     const _objToEvent = (event) => ({
@@ -69,7 +74,7 @@ export const useEventsStore = defineStore("events", () => {
     }
 
     const saveEvent = async (event) => {
-        let response = await fetch(`${BASE_API_URL}/${_EVENTS_API}/save_event`, {
+        let response = await fetch(`${API_URL}/save_event`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify(event),
@@ -85,7 +90,7 @@ export const useEventsStore = defineStore("events", () => {
     }
 
     const saveTask = async (task) => {
-        return await fetch(`${BASE_API_URL}/save_task`, {
+        return await fetch(`${API_URL}/save_task`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify(task),
@@ -96,7 +101,7 @@ export const useEventsStore = defineStore("events", () => {
     }
 
     const updateTask = async (task) => {
-        return await fetch(`${BASE_API_URL}/update_task`, {
+        return await fetch(`${API_URL}/update_task`, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify(task),

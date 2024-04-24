@@ -1,24 +1,30 @@
-const CACHE_NAME = 'cache-v1'
-const PRECACHED_RESOURCES = []
+import { preCacheResources } from "@/service-worker/cache-utils.js";
+import { RequestHandler } from "@/service-worker/modules/RequestHandler.js";
+import { NotImplementedError } from "@/service-worker/exceptions/NotImplementedError.js";
 
-async function preCacheResources() {
-    const cache = await caches.open(CACHE_NAME);
-    return await cache.addAll(PRECACHED_RESOURCES);
-}
-
-window.addEventListener('install', () => {
+self.addEventListener('install', (event) => {
     event.waitUntil(preCacheResources())
+    console.log('Service worker installed', event)
 })
 
-window.addEventListener('fetch', (event) => {
-    try {
-        event.respondWith(handleRequest(event.request))
-    } catch (err) {
-        // Что-то сделать, в зависимости от того, кем эта ошибка была проброшена
-    }
+self.addEventListener('activate', (event) => {
+    console.log('Service worker active', event)
+    return self.clients.claim()
 })
 
-const handleRequest = () => {
+self.addEventListener('fetch', (event) => {
+    const handler = new RequestHandler(event.request)
+    handler.prepareRequestBody().then(() => {
+        try {
+            event.respondWith(handler.handleRequest())
+        } catch (err) {
+            if (err instanceof NotImplementedError) {
+                console.log('Not implemented')
+            } else {
+                console.log(err)
+            }
+        }
+    })
 
-}
 
+})
