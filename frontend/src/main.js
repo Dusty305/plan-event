@@ -41,7 +41,9 @@ if ('serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.register(
           '/service-worker.js',
-          { type: (import.meta.env?.DEV ? 'module' : undefined) }
+          {
+            type: (import.meta.env?.DEV ? 'module' : undefined)
+          }
       );
       await registration.update();
       console.log('Service worker registered!', registration);

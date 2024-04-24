@@ -13,6 +13,7 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
+    console.log('FetchEvent')
     const handler = new RequestHandler(event.request)
     const handleRequestPromise = handler.handleRequest()
         .catch(err => {
