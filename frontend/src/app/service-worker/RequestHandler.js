@@ -1,6 +1,6 @@
-import { urlToPathnameSegments } from "@/service-worker/url-utils.js";
-import { addEvent, getAllEvents, updateEvent } from "@/service-worker/indexedDB-utils.js";
-import { NotImplementedError } from "@/service-worker/exceptions/NotImplementedError.js";
+import { addEvent, getAllEvents, updateEvent } from "@/app/service-worker/utils/indexedDB-utils.js";
+import { NotImplementedError } from "@/app/service-worker/exceptions/NotImplementedError.js";
+import {getStaticResource} from "@/app/service-worker/utils/cache-utils.js";
 
 const SERVER_HOST = import.meta.env.VITE_BASE_HOST;
 
@@ -8,10 +8,20 @@ export class RequestHandler {
     constructor(request) {
         this.request = request;
         this.url = new URL(request.url);
-        this.urlPathnameSegments = urlToPathnameSegments(this.url);
+        this.urlPathnameSegments = this.url.pathname.split('/').slice(1)
     }
 
-    async prepareRequestBody() {
+    async handleRequest() {
+        await this._prepareRequestBody()
+        if (this.url.host === SERVER_HOST) {
+            return await this._handleServerRequest();
+        }
+        else {
+            return await this._handleClientRequest();
+        }
+    }
+
+    async _prepareRequestBody() {
         try {
             this.requestBody = await this.request.json();
         } catch (err) {
@@ -20,17 +30,7 @@ export class RequestHandler {
         return this.requestBody
     }
 
-    handleRequest() {
-        if (this.url.host === SERVER_HOST) {
-            return this._handleServerRequest();
-        }
-        else {
-            return this._handleClientRequest();
-        }
-    }
-
     _handleServerRequest() {
-        console.log('Handling server request');
         if (this.urlPathnameSegments[0] !== 'api') {
             throw new Error('Error parsing server request url. Url has to start with "api/"')
         }
@@ -56,6 +56,6 @@ export class RequestHandler {
     }
 
     _handleClientRequest() {
-        throw new NotImplementedError('Cache is not implemented');
+        return getStaticResource(this.request);
     }
 }

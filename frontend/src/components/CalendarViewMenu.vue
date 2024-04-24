@@ -1,5 +1,5 @@
 <script setup>
-import {useCalendarStore} from "../../stores/CalendarStore.js";
+import {useCalendarStore} from "../app/stores/CalendarStore.js";
 
 const calendarStore = useCalendarStore()
 </script>

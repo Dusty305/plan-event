@@ -3,11 +3,11 @@ import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from '@fullcalendar/daygrid'
 import multiMonthPlugin from '@fullcalendar/multimonth'
 import {computed, ref, watch, onMounted, onBeforeMount} from "vue";
-import {useEventsStore} from "../stores/EventsStore.js";
+import {useEventsStore} from "../app/stores/EventsStore.js";
 import {storeToRefs} from "pinia";
-import {useCalendarStore} from "../stores/CalendarStore.js";
-import EventCard from "../components/cards/EventCard.vue";
-import {useSnackbarStore} from "@/stores/SnackbarStore.js";
+import {useCalendarStore} from "../app/stores/CalendarStore.js";
+import EventCard from "../modules/cards/EventCard.vue";
+import {useSnackbarStore} from "@/app/stores/SnackbarStore.js";
 
 const emit = defineEmits(['edit-event'])
 

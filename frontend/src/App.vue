@@ -1,14 +1,14 @@
 <script setup>
 import {storeToRefs} from "pinia";
-import {useUserStore} from "./stores/UserStore.js";
-import {useCalendarStore} from "./stores/CalendarStore.js";
-import {useSnackbarStore} from "./stores/SnackbarStore.js";
-import CalendarViewMenu from "./components/toolbar/CalendarViewMenu.vue";
-import AuthTabbedSheet from "./components/dialogs/auth/AuthTabbedSheet.vue";
+import {useUserStore} from "./app/stores/UserStore.js";
+import {useCalendarStore} from "./app/stores/CalendarStore.js";
+import {useSnackbarStore} from "./app/stores/SnackbarStore.js";
+import CalendarViewMenu from "./components/CalendarViewMenu.vue";
+import AuthTabbedSheet from "./modules/auth/AuthTabbedSheet.vue";
 import {onBeforeMount} from "vue";
-import EditEventCard from "./components/dialogs/edit-cards/EditEventCard.vue";
-import {router} from "@/router/index.js";
-import {useEventsStore} from "@/stores/EventsStore.js";
+import EditEventCard from "./modules/edit-cards/EditEventCard.vue";
+import {router} from "@/app/router/index.js";
+import {useEventsStore} from "@/app/stores/EventsStore.js";
 
 //
 // Pinia stores

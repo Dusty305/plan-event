@@ -1,6 +1,6 @@
 <script setup>
 import {watch} from "vue";
-import {reverseAddressPartsByLatLong} from "../../services/GeoService.js";
+import {reverseAddressPartsByLatLong} from "../../app/services/GeoService.js";
 const props = defineProps({
   longitude: {
     required: false,

@@ -2,7 +2,7 @@
 import {ref} from "vue";
 import RegistrationCard from "./RegistrationCard.vue";
 import AuthorizationCard from "./AuthorizationCard.vue";
-import {useSnackbarStore} from "../../../stores/SnackbarStore.js";
+import {useSnackbarStore} from "../../app/stores/SnackbarStore.js";
 
 const emit = defineEmits(['closeDialog'])
 

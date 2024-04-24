@@ -1,13 +1,13 @@
 <script setup>
-import {useEventsStore} from "../../../stores/EventsStore.js";
-import {useSnackbarStore} from "../../../stores/SnackbarStore.js";
+import {useEventsStore} from "../../app/stores/EventsStore.js";
+import {useSnackbarStore} from "../../app/stores/SnackbarStore.js";
 import {onBeforeMount} from "vue";
-import DatePicker from "../../v-card-items/DatePicker.vue";
-import GeoPicker from "../../v-card-items/GeoPicker.vue";
-import NameTextField from "../../v-card-items/NameTextField.vue";
-import DescriptionTextarea from "../../v-card-items/DescriptionTextarea.vue";
-import ColorPicker from "../../v-card-items/ColorPicker.vue";
-import HeaderCardItem from "../../v-card-items/HeaderCardItem.vue";
+import DatePicker from "../../components/v-card-items/DatePicker.vue";
+import GeoPicker from "../../components/v-card-items/GeoPicker.vue";
+import NameTextField from "../../components/v-card-items/NameTextField.vue";
+import DescriptionTextarea from "../../components/v-card-items/DescriptionTextarea.vue";
+import ColorPicker from "../../components/v-card-items/ColorPicker.vue";
+import HeaderCardItem from "../../components/v-card-items/HeaderCardItem.vue";
 
 const props = defineProps({
   newEvent: {

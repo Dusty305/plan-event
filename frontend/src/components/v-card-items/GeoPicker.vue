@@ -2,7 +2,7 @@
 import {LMap, LTileLayer, LMarker, LPopup} from "@vue-leaflet/vue-leaflet";
 import 'leaflet/dist/leaflet.css'
 import L from "leaflet";
-import {reverseAddressNameByLatLong} from "@/services/GeoService.js";
+import {reverseAddressNameByLatLong} from "@/app/services/GeoService.js";
 import {watch, onMounted} from "vue";
 
 const props = defineProps({

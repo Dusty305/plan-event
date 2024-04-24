@@ -23,9 +23,9 @@ request.onupgradeneeded = (event) => {
 }
 
 const rejectIfDBNonExistent = (reject) => {
-    if (!db) {
-        new Response('DB was not created', { status: 500 })
-        return reject()
+    if (!dbExists) {
+        const response = new Response('DB was not created', { status: 500 })
+        return reject(response)
     }
 }
 

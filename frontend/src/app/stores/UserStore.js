@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {ref} from "vue";
-import {BASE_API_URL} from "../main.js";
+import {BASE_API_URL} from "../../main.js";
 
 const _LOCAL_STORAGE_JWT_KEY = 'jwt'
 

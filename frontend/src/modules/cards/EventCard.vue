@@ -1,5 +1,5 @@
 <script setup>
-import HeaderEditCardItem from "../v-card-items/HeaderCardItem.vue";
+import HeaderEditCardItem from "../../components/v-card-items/HeaderCardItem.vue";
 
 const props = defineProps({
   event: {

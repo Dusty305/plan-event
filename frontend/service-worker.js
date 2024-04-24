@@ -1,6 +1,6 @@
-import { preCacheResources } from "@/service-worker/cache-utils.js";
-import { RequestHandler } from "@/service-worker/modules/RequestHandler.js";
-import { NotImplementedError } from "@/service-worker/exceptions/NotImplementedError.js";
+import { preCacheResources } from "@/app/service-worker/utils/cache-utils.js";
+import { RequestHandler } from "@/app/service-worker/RequestHandler.js";
+import { NotImplementedError } from "@/app/service-worker/exceptions/NotImplementedError.js";
 
 self.addEventListener('install', (event) => {
     event.waitUntil(preCacheResources())
@@ -14,17 +14,13 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
     const handler = new RequestHandler(event.request)
-    handler.prepareRequestBody().then(() => {
-        try {
-            event.respondWith(handler.handleRequest())
-        } catch (err) {
+    const handleRequestPromise = handler.handleRequest()
+        .catch(err => {
             if (err instanceof NotImplementedError) {
                 console.log('Not implemented')
             } else {
                 console.log(err)
             }
-        }
-    })
-
-
+        })
+    event.respondWith(handleRequestPromise)
 })

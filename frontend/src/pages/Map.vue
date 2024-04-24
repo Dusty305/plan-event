@@ -1,7 +1,7 @@
 <script setup>
 import {LMap, LMarker, LPopup, LTileLayer} from "@vue-leaflet/vue-leaflet";
 import {storeToRefs} from "pinia";
-import {useEventsStore} from "@/stores/EventsStore.js";
+import {useEventsStore} from "@/app/stores/EventsStore.js";
 import L from "leaflet";
 
 const emit = defineEmits(['edit-event'])

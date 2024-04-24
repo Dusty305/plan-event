@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
-import {BASE_API_URL} from "../main.js";
+import {BASE_API_URL} from "../../main.js";
 import {useUserStore} from "./UserStore.js";
 import {incrementWeek} from "../util/dateUtils.js";
 
