@@ -84,6 +84,7 @@ export const useEventsStore = defineStore("events", () => {
             })
         })
         if (response.ok) {
+            event = _objToEvent(await response.json())
             events.value.push(event)
         }
         return response

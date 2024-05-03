@@ -59,8 +59,9 @@ export const addEvent = (event) => new Promise(async (resolve, reject) => {
     const storeRequest = store.add(event);
 
     let response
-    storeRequest.onsuccess = () => {
+    storeRequest.onsuccess = (idbEvent) => {
         transaction.commit()
+        event.id = idbEvent.target.result
         response = new Response(JSON.stringify(event), { status: 201 })
         return resolve(response)
     }
