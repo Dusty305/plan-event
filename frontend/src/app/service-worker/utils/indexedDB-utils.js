@@ -103,7 +103,7 @@ export const removeEvent = (eventId) => new Promise(async (resolve, reject) => {
     let response
     deleteRequest.onsuccess = () => {
         transaction.commit()
-        response = new Response(event.id, { status: 200 })
+        response = new Response(eventId, { status: 200 })
         return resolve(response)
     }
     deleteRequest.onerror = () => {

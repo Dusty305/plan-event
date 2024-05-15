@@ -1,6 +1,5 @@
 import {defineStore} from "pinia";
 import {computed, ref} from "vue";
-import {BASE_API_URL} from "../../main.js";
 import {useUserStore} from "./UserStore.js";
 import {incrementWeek} from "../util/dateUtils.js";
 
@@ -100,6 +99,10 @@ export const useEventsStore = defineStore("events", () => {
                     'Authorization': useUserStore().jwt
                 })
             })
+            if (response.ok) {
+                const index = _getEventIndexById(event.id)
+                events.value.splice(index, 1)
+            }
             return response.ok
         } catch (err) {
             return false

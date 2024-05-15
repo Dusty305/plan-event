@@ -84,6 +84,7 @@ const deleteSelectedEvent = () => {
     const snackbarStore = useSnackbarStore()
     if (eventsStore.removeEvent(selectedEvent.value)) {
       snackbarStore.showSnackbar('Мероприятие было удалено', snackbarStore.SUCCESS_COLOR)
+      selectedEvent.value = null
     }
     else {
       snackbarStore.showSnackbar('Мероприятие не удалось удалить', snackbarStore.ERROR_COLOR)

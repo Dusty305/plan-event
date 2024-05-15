@@ -1,6 +1,6 @@
-import { preCacheResources } from "@/app/service-worker/utils/cache-utils.js";
-import { RequestHandler } from "@/app/service-worker/RequestHandler.js";
-import { NotImplementedError } from "@/app/service-worker/exceptions/NotImplementedError.js";
+import { preCacheResources } from "./src/app/service-worker/utils/cache-utils.js";
+import { RequestHandler } from "./src/app/service-worker/RequestHandler.js";
+import { NotImplementedError } from "./src/app/service-worker/exceptions/NotImplementedError.js";
 
 self.addEventListener('install', (event) => {
     event.waitUntil(preCacheResources())
