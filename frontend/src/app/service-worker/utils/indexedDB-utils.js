@@ -92,3 +92,23 @@ export const updateEvent = (event) => new Promise(async (resolve, reject) => {
         return reject(response)
     }
 })
+
+export const removeEvent = (eventId) => new Promise(async (resolve, reject) => {
+    rejectIfDBNonExistent(reject)
+
+    const transaction = db.transaction([EVENTS_STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(EVENTS_STORE_NAME);
+    const deleteRequest = store.delete(eventId)
+
+    let response
+    deleteRequest.onsuccess = () => {
+        transaction.commit()
+        response = new Response(event.id, { status: 200 })
+        return resolve(response)
+    }
+    deleteRequest.onerror = () => {
+        transaction.abort()
+        response = new Response(null, { status: 400 })
+        return reject(response)
+    }
+})

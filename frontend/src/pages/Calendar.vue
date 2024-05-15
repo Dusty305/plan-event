@@ -74,9 +74,21 @@ const calendarOptions = ref({
   }
 })
 
-const handleMapBtnClicked = () => {
+const routeToEventOnMap = () => {
   const snackbarStore = useSnackbarStore()
   snackbarStore.showSnackbar('Функционал в разработке', snackbarStore.INFO_COLOR)
+}
+
+const deleteSelectedEvent = () => {
+  if (selectedEvent.value) {
+    const snackbarStore = useSnackbarStore()
+    if (eventsStore.removeEvent(selectedEvent.value)) {
+      snackbarStore.showSnackbar('Мероприятие было удалено', snackbarStore.SUCCESS_COLOR)
+    }
+    else {
+      snackbarStore.showSnackbar('Мероприятие не удалось удалить', snackbarStore.ERROR_COLOR)
+    }
+  }
 }
 
 //
@@ -107,8 +119,9 @@ watch(events, () => {
       v-if="selectedEvent"
       :event="selectedEvent"
       :style="cardStyle"
-      @edit-btn-clicked="emit('edit-event', selectedEvent.id)"
+      @edit-btn-clicked="emit('edit-event', selectedEvent.id); selectedEvent = null;"
+      @delete-btn-clicked="deleteSelectedEvent"
       @close-card="selectedEvent = null"
-      @map-btn-clicked="handleMapBtnClicked"
+      @map-btn-clicked="routeToEventOnMap"
   />
 </template>

@@ -13,12 +13,11 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-    console.log('FetchEvent')
     const handler = new RequestHandler(event.request)
     const handleRequestPromise = handler.handleRequest()
         .catch(err => {
             if (err instanceof NotImplementedError) {
-                console.log('Not implemented')
+                console.log('SW. Not implemented')
             } else {
                 console.log(err)
             }

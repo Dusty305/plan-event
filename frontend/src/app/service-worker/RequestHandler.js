@@ -1,4 +1,4 @@
-import { addEvent, getAllEvents, updateEvent } from "@/app/service-worker/utils/indexedDB-utils.js";
+import {addEvent, getAllEvents, removeEvent, updateEvent} from "@/app/service-worker/utils/indexedDB-utils.js";
 import { NotImplementedError } from "@/app/service-worker/exceptions/NotImplementedError.js";
 import {getStaticResource} from "@/app/service-worker/utils/cache-utils.js";
 
@@ -50,6 +50,8 @@ export class RequestHandler {
                 return updateEvent(this.requestBody);
             case 'save_event':
                 return addEvent(this.requestBody);
+            case 'remove_event':
+                return removeEvent(this.requestBody)
             default:
                 throw new NotImplementedError('API is not defined for ' + this.url.pathname);
         }

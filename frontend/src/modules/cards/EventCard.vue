@@ -7,7 +7,7 @@ const props = defineProps({
     type: Object
   }
 })
-const emit = defineEmits(['editBtnClicked', 'mapBtnClicked', 'closeCard'])
+const emit = defineEmits(['editBtnClicked', 'mapBtnClicked', 'deleteBtnClicked', 'closeCard'])
 
 const eventDuration = computed(() => `${props.event.start.toDateString()} - ${props.event.end.toDateString()}`)
 </script>
@@ -31,5 +31,9 @@ const eventDuration = computed(() => `${props.event.start.toDateString()} - ${pr
     <v-card-item>
       <p class="text-body-2">{{ props.event.description }}</p>
     </v-card-item>
+    <v-card-actions>
+      <v-btn text="удалить" @click="emit('deleteBtnClicked')"/>
+      <v-btn text="изменить" @click="emit('editBtnClicked')"/>
+    </v-card-actions>
   </v-card>
 </template>

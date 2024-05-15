@@ -90,6 +90,22 @@ export const useEventsStore = defineStore("events", () => {
         return response
     }
 
+    const removeEvent = async (event) => {
+        try {
+            const response = await fetch(`${API_URL}/remove_event`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify(event.id),
+                headers: new Headers({
+                    'Authorization': useUserStore().jwt
+                })
+            })
+            return response.ok
+        } catch (err) {
+            return false
+        }
+    }
+
     const saveTask = async (task) => {
         return await fetch(`${API_URL}/save_task`, {
             method: 'POST',
@@ -151,6 +167,7 @@ export const useEventsStore = defineStore("events", () => {
         saveEvent,
         saveTask,
         refreshEvents,
+        removeEvent,
         updateEventDataByID,
         getEventById,
         getEventCopyById,
@@ -158,93 +175,3 @@ export const useEventsStore = defineStore("events", () => {
 
     }
 })
-
-/*
-
-//
-// Store for GH Pages
-//
-
-export const useEventsStore = defineStore("events", () => {
-    const events = ref([])
-    const refreshing = ref(false)
-
-    const refreshEvents = async () => {
-        refreshing.value = true
-        const eventsStr = localStorage.getItem('events')
-        if (!eventsStr) {
-            events.value = []
-            _loadEventsToLocalStorage()
-        }
-        else {
-            events.value = JSON.parse(eventsStr).map(_objToEvent)
-        }
-        refreshing.value = false
-        console.log(events.value)
-        return true
-    }
-
-    const updateEventDataByID = async (id, data) => {
-        const index = _getEventIndexById(id)
-        if (index === -1 || !data) {
-            return false
-        }
-        events.value[index] = { ...data }
-        _loadEventsToLocalStorage()
-        return true
-    }
-
-    const saveEvent = async (event) => {
-        events.value.push(event)
-        _loadEventsToLocalStorage()
-        return true
-    }
-
-    const generateNewEvent = () => ({
-        id: _generateId(),
-        name: '',
-        description: '',
-        start: new Date(),
-        end: incrementWeek(new Date()),
-        color: "#00FFFF",
-        location: {
-            address: null,
-            latitude: null,
-            longitude: null,
-        }
-    })
-
-    const getEventById = (id) => readonly(_getEventById(id))
-
-    const getEventCopyById = (id) => _objToEvent(JSON.parse(JSON.stringify(_getEventById(id))))
-
-    const _generateId = () => {
-        const l = events.value.length
-        return l > 0 ? events.value[l - 1].id + 1 : 0
-    }
-
-    const _loadEventsToLocalStorage = () => localStorage.setItem('events', JSON.stringify(events.value))
-
-    const _getEventIndexById = (id) => events.value.findIndex((event) => event.id == id)
-
-    const _getEventById = (id) => events.value[_getEventIndexById(id)]
-
-    const _objToEvent = (event) => ({
-        ...event,
-        start: new Date(event.start),
-        end: new Date(event.end),
-    })
-
-    return {
-        events: computed(() => events.value.map(event => ({ ...event, title: event.name }))),
-        refreshing,
-        saveEvent,
-        refreshEvents,
-        updateEventDataByID,
-        getEventById,
-        getEventCopyById,
-        generateNewEvent
-
-    }
-})
-*/
