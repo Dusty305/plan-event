@@ -9,6 +9,8 @@ import {onBeforeMount} from "vue";
 import EditEventCard from "./modules/edit-cards/EditEventCard.vue";
 import {router} from "@/app/router/index.js";
 import {useEventsStore} from "@/app/stores/EventsStore.js";
+import EditTaskCard from "@/modules/edit-cards/EditTaskCard.vue";
+import {addTask} from "@/app/service-worker/idb/events-service.js";
 
 //
 // Pinia stores
@@ -25,11 +27,15 @@ const { snackbar, color, text } = storeToRefs(snackbarStore)
 //
 
 const addEventDialog = ref(false)
-//const addTaskDialog = ref(false)
+const addTaskDialog = ref(false)
 const editEventDialog = ref(false)
+const editTaskDialog = ref(false)
+
+const dialogIsOpen = computed(() => addEventDialog.value || addTaskDialog.value || editEventDialog.value || editTaskDialog.value)
+
 const editEventId = ref(null)
-//const editTaskDialog = ref(false)
-//const editTaskId = ref(false)
+const editTaskId = ref(null)
+
 const authDialog = ref(false)
 
 //
@@ -80,7 +86,10 @@ onBeforeMount(async () => {
       </v-btn>
     </v-app-bar>
     <v-main>
-      <router-view @edit-event="(id) => { editEventId = id; editEventDialog = true }"/>
+      <router-view
+          @edit-event="(id) => { editEventId = id; editEventDialog = true; }"
+          @edit-task="(taskId) => { editTaskId = taskId; editTaskDialog = true; }"
+      />
       <v-menu location="right">
         <template v-slot:activator="{ props }">
           <v-btn
@@ -95,29 +104,36 @@ onBeforeMount(async () => {
         </template>
         <v-list>
           <v-list-item title="Add event" @click="addEventDialog = true"/>
-          <v-list-item title="Add task" @click="addEventDialog = true"/>
+          <v-list-item title="Add task" @click="addTaskDialog = true"/>
         </v-list>
       </v-menu>
-      <v-snackbar v-model="snackbar" :text="text" :color="color"/>
-      <v-dialog v-model="addEventDialog">
+      <v-dialog v-model="dialogIsOpen">
         <EditEventCard
+            v-if="addEventDialog"
             :new-event="true"
-            @close-card="addEventDialog = false"/>
-      </v-dialog>
-      <v-dialog v-model="editEventDialog">
+            @close-card="addEventDialog = false"
+        />
         <EditEventCard
+            v-else-if="editEventDialog"
             :event-id="editEventId"
             @close-card="editEventDialog = false; editEventId = null;"
         />
+        <EditTaskCard
+            v-else-if="addTaskDialog"
+            :new-task="true"
+            @close-card="addTaskDialog = false"
+        />
+        <EditTaskCard
+            v-else-if="editTaskDialog"
+            :task-id="editTaskId"
+            @close-card="editTaskDialog = false; editTaskId = null"
+        />
+        <AuthTabbedSheet
+            v-else-if="authDialog"
+            @close-dialog="authDialog = false"
+        />
       </v-dialog>
-      <!--v-dialog v-model="addTaskDialog">
-        <EditEventCard
-            :new-event="true"
-            @close-card="addTaskDialog = false"/>
-      </v-dialog-->
-      <v-dialog v-model="authDialog">
-        <AuthTabbedSheet @close-dialog="authDialog = false"/>
-      </v-dialog>
+      <v-snackbar v-model="snackbar" :text="text" :color="color"/>
     </v-main>
   </v-app>
 </template>

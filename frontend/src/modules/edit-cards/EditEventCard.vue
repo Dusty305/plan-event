@@ -67,7 +67,7 @@ const saveEvent = async () => {
 }
 
 const updateEvent = async () => {
-  let response = await eventsStore.updateEventDataByID(props.eventId, event.value)
+  let response = await eventsStore.updateEvent(event.value)
   if (response) {
     snackbarStore.showSnackbar('Мероприятие было обновлено', snackbarStore.SUCCESS_COLOR)
     emit('closeCard')
@@ -141,9 +141,6 @@ onBeforeMount(() => {
           :latitude="event.location.latitude"
           @lat-lng-updated="updatePoint"
       />
-    </v-card-item>
-    <v-card-item>
-      <ColorPicker/>
     </v-card-item>
     <v-card-actions>
       <v-btn variant="elevated" class="ml-2" text="Сохранить" @click="handleSaveBtnClick"/>

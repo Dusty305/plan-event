@@ -2,21 +2,27 @@
 import FullCalendar from "@fullcalendar/vue3";
 import dayGridPlugin from '@fullcalendar/daygrid'
 import multiMonthPlugin from '@fullcalendar/multimonth'
-import {computed, ref, watch, onMounted, onBeforeMount} from "vue";
+import {computed, ref, watch, onMounted} from "vue";
 import {useEventsStore} from "../app/stores/EventsStore.js";
 import {storeToRefs} from "pinia";
 import {useCalendarStore} from "../app/stores/CalendarStore.js";
 import EventCard from "../modules/cards/EventCard.vue";
 import {useSnackbarStore} from "@/app/stores/SnackbarStore.js";
+import TaskCard from "@/modules/cards/TaskCard.vue";
+import {
+  eventsToFullCalendarEvents,
+  getEventByFcEventId,
+  getTaskByFcEventId,
+  isTaskByFcEventId
+} from "@/app/util/fcCalendar-utils.js";
 
-const emit = defineEmits(['edit-event'])
+const emit = defineEmits(['edit-event', 'edit-task'])
 
 //
 // Pinia stores
 //
 
 const eventsStore = useEventsStore()
-const { events } = storeToRefs(eventsStore)
 const { fullCalendarView, date, INITIAL_CALENDAR_VIEW, initialDate } = storeToRefs(useCalendarStore())
 
 //
@@ -55,22 +61,32 @@ const calculatePositionFromRect = (rect) => {
 // FullCalendar options
 //
 
+const { events } = storeToRefs(eventsStore)
+const fcEvents = ref([])
+
 const selectedEvent = ref(null)
+const selectedTask = ref(null)
 const calendarOptions = ref({
   plugins: [ dayGridPlugin, multiMonthPlugin ],
   initialView: INITIAL_CALENDAR_VIEW,
-  events: events,
+  events: fcEvents,
   // style
   height: "95%",
   headerToolbar: false,
   initialDate: initialDate,
   // actions
   eventClick: (info) => {
+    const fcEventId = info.event.id
     const rect = info.el.getBoundingClientRect()
     eventCardPosition.value = calculatePositionFromRect(rect)
-    selectedEvent.value = eventsStore.getEventById(info.event.id)
-    console.log(info.event)
-    console.log(selectedEvent.value)
+    if (!isTaskByFcEventId(fcEventId)) {
+      selectedTask.value = null
+      selectedEvent.value = getEventByFcEventId(fcEventId)
+    }
+    else {
+      selectedEvent.value = null
+      selectedTask.value = getTaskByFcEventId(fcEventId)
+    }
   }
 })
 
@@ -92,6 +108,19 @@ const deleteSelectedEvent = () => {
   }
 }
 
+const deleteSelectedTask = () => {
+  if (selectedTask.value) {
+    const snackbarStore = useSnackbarStore()
+    if (eventsStore.removeTask(selectedEvent.value)) {
+      snackbarStore.showSnackbar('Задание было удалено', snackbarStore.SUCCESS_COLOR)
+      selectedTask.value = null
+    }
+    else {
+      snackbarStore.showSnackbar('Задание не удалось удалить', snackbarStore.ERROR_COLOR)
+    }
+  }
+}
+
 //
 // Watchers and hooks
 //
@@ -99,14 +128,12 @@ const deleteSelectedEvent = () => {
 const fullCalendar = ref(null)
 let api
 onMounted(() => api = fullCalendar.value.getApi())
-onBeforeMount(async () => {
-  await eventsStore.refreshEvents()
-})
 watch(fullCalendarView, () => api.changeView(fullCalendarView.value))
 watch(date, () => api.gotoDate(date.value))
 watch(events, () => {
+  fcEvents.value = eventsToFullCalendarEvents(events.value)
   api.removeAllEventSources()
-  api.addEventSource(events)
+  api.addEventSource(fcEvents)
 })
 </script>
 
@@ -123,6 +150,15 @@ watch(events, () => {
       @edit-btn-clicked="emit('edit-event', selectedEvent.id); selectedEvent = null;"
       @delete-btn-clicked="deleteSelectedEvent"
       @close-card="selectedEvent = null"
+      @map-btn-clicked="routeToEventOnMap"
+  />
+  <TaskCard
+      v-else-if="selectedTask"
+      :task="selectedTask"
+      :style="cardStyle"
+      @edit-btn-clicked="emit('edit-task', selectedTask.id); selectedTask = null;"
+      @delete-btn-clicked="deleteSelectedTask"
+      @close-card="selectedTask = null"
       @map-btn-clicked="routeToEventOnMap"
   />
 </template>

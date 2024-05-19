@@ -12,10 +12,81 @@ export const useEventsStore = defineStore("events", () => {
     const events = ref([])
     const refreshing = ref(false)
 
+    //
+    // Utility
+    //
+
+    // todo: do i even need to convert id?
+    const _objToEvent = (event) => ({
+        ...event,
+        id: +event.id,
+        start: new Date(event.start),
+        end: new Date(event.end),
+        tasks: event.tasks instanceof Array ? event.tasks.map(_objToTask) : []
+    })
+    const _objToTask = (task) => ({
+        ...task,
+        id: +task.id,
+        date: new Date(task.date)
+    })
+
+    const _prepareEventToBeSent = (event) => {
+        event = JSON.parse(JSON.stringify(event))
+        event.tasks = undefined
+        return event
+    }
+
+    const _getEventIndexById = (id) => {
+        const idIsEqual = event => event.id === id
+        return events.value.findIndex(idIsEqual)
+    }
+    const _getEventById = (id) => {
+        const index = _getEventIndexById(id)
+        return events.value[index]
+    }
+
+    const _getTaskIndexByIdFromEvent = (taskId, event) => {
+        const idIsEqual = task => task.id === taskId
+        return event.tasks.findIndex(idIsEqual)
+    }
+    const _getTaskByIdFromEvent = (taskId, event) => {
+        const index = _getTaskIndexByIdFromEvent(taskId, event)
+        return event.tasks[index]
+    }
+
+    const getEventById = id => {
+        return readonly(_getEventById(id))
+    }
+
+    const getTaskByIdAndEvent = (id, event) => {
+        return readonly(_getTaskByIdFromEvent(id, event))
+    }
+
+    const getEventCopyById = id => {
+        const event = _getEventById(id);
+        const rawEvent = JSON.parse(JSON.stringify(event))
+        return _objToEvent(rawEvent)
+    }
+    const getTaskCopyById = (id) => {
+        for (const event of events.value) {
+            const task = _getTaskByIdFromEvent(id, event)
+            if (task) {
+                const rawTask = JSON.parse(JSON.stringify(task))
+                return _objToTask(rawTask)
+            }
+        }
+        return undefined
+    }
+
+    //
+    // Events API
+    //
+
     const refreshEvents = async () => {
+        let response
         refreshing.value = true
         try {
-            let response = await fetch(`${API_URL}`, {
+            response = await fetch(`${API_URL}`, {
                 method: 'GET',
                 mode: "cors",
                 headers: new Headers({
@@ -23,72 +94,60 @@ export const useEventsStore = defineStore("events", () => {
                 })
             })
             if (response.ok) {
-                events.value = (await response.json()).map(_objToEvent)
+                const rawEvents = await response.json()
+                events.value = rawEvents.map(_objToEvent)
             }
-            else {
-                console.log("Не удалось получить мероприятия с сервера")
-            }
-            return response.ok
-        } catch (err) {
-            console.log('Events store error: ', err)
-            refreshing.value = false
-            return false
-        } finally {
-            refreshing.value = false
+        } catch (e) {
+            console.log('Error refreshing events - ', e)
         }
-    }
-
-    const _objToEvent = (event) => ({
-        ...event,
-        start: new Date(event.start),
-        end: new Date(event.end),
-    })
-
-    // TODO: pass Event obj and send response
-    const updateEventDataByID = async (id, data) => {
-        const index = _getEventIndexById(id)
-        if (index === -1 || !data) {
-            return undefined
-        }
-
-        const event = events.value[index]
-        let response = await _updateEvent(event)
-        if (response.ok) {
-            events.value[index] = { ...data }
-        }
-        return response
-    }
-
-    // TODO: complete 'todo' above and remove the method
-    const _updateEvent = async (event) => {
-        return await fetch(`${API_URL}/update_event`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify(event),
-            headers: new Headers({
-                'Authorization': useUserStore().jwt,
-                'Content-type': 'application/json'
-            })
-        })
+        refreshing.value = false
+        return response?.ok
     }
 
     const saveEvent = async (event) => {
-        let response = await fetch(`${API_URL}/save_event`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify(event),
-            headers: new Headers({
-                'Authorization': useUserStore().jwt,
-                'Content-type': 'application/json'
+        try {
+            const response = await fetch(`${API_URL}/save_event`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify(_prepareEventToBeSent(event)),
+                headers: new Headers({
+                    'Authorization': useUserStore().jwt,
+                    'Content-type': 'application/json'
+                })
             })
-        })
-        if (response.ok) {
-            event = _objToEvent(await response.json())
-            events.value.push(event)
+            if (!response.ok) {
+                return false
+            }
+            event.id = await response.json()
+            events.value.push(_objToEvent(event))
+            return true
+        } catch (e) {
+            console.log('Error saving event - ', e)
+            return false
         }
-        return response
     }
-
+    const updateEvent = async (event) => {
+        try {
+            const response = await fetch(`${API_URL}/update_event`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify(_prepareEventToBeSent(event)),
+                headers: new Headers({
+                    'Authorization': useUserStore().jwt,
+                    'Content-type': 'application/json'
+                })
+            })
+            if (!response.ok) {
+                return false
+            }
+            const index = _getEventIndexById(event.id)
+            events.value[index] = event
+            return true
+        } catch (e) {
+            console.log('Error updating event - ', e)
+            return false
+        }
+    }
     const removeEvent = async (event) => {
         try {
             const response = await fetch(`${API_URL}/remove_event`, {
@@ -99,56 +158,85 @@ export const useEventsStore = defineStore("events", () => {
                     'Authorization': useUserStore().jwt
                 })
             })
-            if (response.ok) {
-                const index = _getEventIndexById(event.id)
-                events.value.splice(index, 1)
+            if (!response.ok) {
+                return false
             }
-            return response.ok
-        } catch (err) {
+            const index = _getEventIndexById(event.id)
+            events.value.splice(index, 1)
+            return true
+        } catch (e) {
+            console.log('Error removing event - ', e)
             return false
         }
     }
 
     const saveTask = async (task) => {
-        return await fetch(`${API_URL}/save_task`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify(task),
-            headers: new Headers({
-                'Authorization': useUserStore().jwt
+        try {
+            const response = await fetch(`${API_URL}/save_task`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify(task),
+                headers: new Headers({
+                    'Authorization': useUserStore().jwt
+                })
             })
-        })
+            if (!response.ok) {
+                return false
+            }
+            task.id = await response.json()
+            // saving the new task to the existing event
+            let event = _getEventById(task.eventId)
+            event.tasks.push(task)
+            return true
+        } catch (e) {
+            console.log('Error saving task - ', e)
+            return false
+        }
     }
-
     const updateTask = async (task) => {
-        return await fetch(`${API_URL}/update_task`, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify(task),
-            headers: new Headers({
-                'Authorization': useUserStore().jwt
+        try {
+            const response = await fetch(`${API_URL}/update_task`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify(task),
+                headers: new Headers({
+                    'Authorization': useUserStore().jwt
+                })
             })
-        })
+            if (!response.ok) {
+                return false
+            }
+            let event = _getEventById(task.eventId)
+            const index = _getTaskIndexByIdFromEvent(task.id, event)
+            event.tasks[index] = task
+            return true
+        } catch (e) {
+            console.log('Error updating task - ', e)
+            return false
+        }
     }
-
-    const _getEventIndexById = (id) => {
-        const idIsEqual = (event) => event.id == id
-        return events.value.findIndex(idIsEqual)
-    }
-
-    const _getEventById = (id) => {
-        const index = _getEventIndexById(id)
-        return events.value[index]
-    }
-
-    const getEventById = (id) => {
-        return readonly(_getEventById(id))
-    }
-
-    const getEventCopyById = (id) => {
-        const event = _getEventById(id);
-        const rawEvent = JSON.parse(JSON.stringify(event))
-        return _objToEvent(rawEvent)
+    const removeTask = async (task) => {
+        const requestBody = { taskId: task.id, eventId: task.eventId }
+        try {
+            const response = await fetch(`${API_URL}/remove_event`, {
+                method: 'POST',
+                mode: 'cors',
+                body: JSON.stringify(requestBody),
+                headers: new Headers({
+                    'Authorization': useUserStore().jwt
+                })
+            })
+            if (!response.ok) {
+                return false
+            }
+            let event = _getEventById(task.eventId)
+            const index = _getTaskIndexByIdFromEvent(task.id, event)
+            event.tasks.splice(index, 1)
+            return true
+        } catch (e) {
+            console.log('Error deleting task - ', e)
+            return false
+        }
     }
 
     const generateNewEvent = () => ({
@@ -161,20 +249,29 @@ export const useEventsStore = defineStore("events", () => {
             address: null,
             latitude: null,
             longitude: null,
-        }
+        },
+        tasks: []
+    })
+    const generateNewTask = (eventId) => ({
+        name: '',
+        description: '',
+        date: new Date(),
+        location: {
+            address: null,
+            latitude: null,
+            longitude: null,
+        },
+        color: "#00FFFF",
+        eventId: eventId ?? null
     })
 
     return {
-        events: computed(() => events.value.map(event => ({ ...event, title: event.name }))),
-        refreshing,
-        saveEvent,
-        saveTask,
-        refreshEvents,
-        removeEvent,
-        updateEventDataByID,
-        getEventById,
-        getEventCopyById,
-        generateNewEvent
-
+        events: computed(() => events.value.map(event => event)),
+        refreshEvents, refreshing,
+        saveEvent, updateEvent, removeEvent,
+        saveTask, updateTask, removeTask,
+        getEventById, getTaskByIdAndEvent,
+        getEventCopyById, getTaskCopyById,
+        generateNewEvent, generateNewTask
     }
 })
