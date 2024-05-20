@@ -96,6 +96,7 @@ export const useEventsStore = defineStore("events", () => {
             if (response.ok) {
                 const rawEvents = await response.json()
                 events.value = rawEvents.map(_objToEvent)
+                console.log(events.value)
             }
         } catch (e) {
             console.log('Error refreshing events - ', e)

@@ -11,6 +11,8 @@ import {router} from "@/app/router/index.js";
 import {useEventsStore} from "@/app/stores/EventsStore.js";
 import EditTaskCard from "@/modules/edit-cards/EditTaskCard.vue";
 import {addTask} from "@/app/service-worker/idb/events-service.js";
+import {useAppStore} from "@/app/stores/AppStore.js";
+import TasksList from "@/modules/sidebar/TasksList.vue";
 
 //
 // Pinia stores
@@ -21,6 +23,9 @@ const userStore = useUserStore()
 
 const snackbarStore = useSnackbarStore()
 const { snackbar, color, text } = storeToRefs(snackbarStore)
+
+const appStore = useAppStore()
+const { sidebarEvent, sidebar } = storeToRefs(appStore)
 
 //
 // Dialogs
@@ -85,6 +90,13 @@ onBeforeMount(async () => {
       <v-btn :prepend-icon="routerBtnIcon" :text="routerBtnText" @click="handleRouterBtnClicked">
       </v-btn>
     </v-app-bar>
+    <v-navigation-drawer v-model="sidebar" location="right" width="400">
+      <TasksList
+          :event="sidebarEvent"
+          @add-task="(eventId) => { editEventId = eventId; addTaskDialog = true; }"
+          @edit-task="(id) => { editTaskId = id; editTaskDialog = true; }"
+      />
+    </v-navigation-drawer>
     <v-main>
       <router-view
           @edit-event="(id) => { editEventId = id; editEventDialog = true; }"
@@ -121,6 +133,7 @@ onBeforeMount(async () => {
         <EditTaskCard
             v-else-if="addTaskDialog"
             :new-task="true"
+            :event-id="editEventId"
             @close-card="addTaskDialog = false"
         />
         <EditTaskCard

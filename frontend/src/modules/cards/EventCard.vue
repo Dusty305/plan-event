@@ -7,7 +7,7 @@ const props = defineProps({
     type: Object
   }
 })
-const emit = defineEmits(['editBtnClicked', 'mapBtnClicked', 'deleteBtnClicked', 'closeCard'])
+const emit = defineEmits(['editBtnClicked', 'mapBtnClicked', 'deleteBtnClicked', 'closeCard', 'showTasks'])
 
 const eventDuration = computed(() => `${props.event.start.toDateString()} - ${props.event.end.toDateString()}`)
 </script>
@@ -19,7 +19,8 @@ const eventDuration = computed(() => `${props.event.start.toDateString()} - ${pr
         :latitude="props.event.location.latitude"
         :color="props.event.color">
       <v-btn class="mx-2" elevation="4" :color="props.event.color" size="small" icon="mdi-pen" @click="emit('editBtnClicked'); emit('closeCard')"/>
-      <v-btn class="mx-2" elevation="4" :color="props.event.color" size="small" icon="mdi-map" @click="emit('mapBtnClicked')"/>
+      <!--v-btn class="mx-2" elevation="4" :color="props.event.color" size="small" icon="mdi-map" @click="emit('mapBtnClicked')"/-->
+      <v-btn class="mx-2" elevation="4" :color="props.event.color" size="small" icon="mdi-checkbox-multiple-marked-outline" @click="emit('showTasks'); emit('closeCard')"/>
       <v-btn class="mx-2" elevation="4" :color="props.event.color" size="small" icon="mdi-close" @click="emit('closeCard')"/>
     </HeaderEditCardItem>
     <v-card-title>

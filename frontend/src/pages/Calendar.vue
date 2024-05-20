@@ -15,6 +15,7 @@ import {
   getTaskByFcEventId,
   isTaskByFcEventId
 } from "@/app/util/fcCalendar-utils.js";
+import {useAppStore} from "@/app/stores/AppStore.js";
 
 const emit = defineEmits(['edit-event', 'edit-task'])
 
@@ -151,6 +152,7 @@ watch(events, () => {
       @delete-btn-clicked="deleteSelectedEvent"
       @close-card="selectedEvent = null"
       @map-btn-clicked="routeToEventOnMap"
+      @show-tasks="useAppStore().openTasksSidebar(selectedEvent)"
   />
   <TaskCard
       v-else-if="selectedTask"

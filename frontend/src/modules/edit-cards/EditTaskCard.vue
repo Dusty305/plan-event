@@ -19,6 +19,9 @@ const props = defineProps({
         return value instanceof Number
       }
     }
+  },
+  eventId: {
+    required: false
   }
 })
 const emit = defineEmits(['closeCard'])

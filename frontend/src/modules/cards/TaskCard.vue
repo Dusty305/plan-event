@@ -19,7 +19,7 @@ const eventDuration = computed(() => props.task.date.toDateString())
         :latitude="props.task.location.latitude"
         :color="props.task.color">
       <v-btn class="mx-2" elevation="4" :color="props.task.color" size="small" icon="mdi-pen" @click="emit('editBtnClicked'); emit('closeCard')"/>
-      <v-btn class="mx-2" elevation="4" :color="props.task.color" size="small" icon="mdi-map" @click="emit('mapBtnClicked')"/>
+      <!--v-btn class="mx-2" elevation="4" :color="props.task.color" size="small" icon="mdi-map" @click="emit('mapBtnClicked')"/-->
       <v-btn class="mx-2" elevation="4" :color="props.task.color" size="small" icon="mdi-close" @click="emit('closeCard')"/>
     </HeaderEditCardItem>
     <v-card-title>
