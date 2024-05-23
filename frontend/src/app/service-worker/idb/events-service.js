@@ -1,5 +1,7 @@
 import {createTransaction, EVENTS_STORE_NAME, TASKS_STORE_NAME} from "@/app/service-worker/idb/idb.js";
 
+const hasGlobalEvent = (event) => event.globalEventId || event.globalEventId === 0
+
 export const getAllEvents = async () => {
     const transaction = createTransaction([EVENTS_STORE_NAME, TASKS_STORE_NAME], 'readonly')
     try {
@@ -53,6 +55,7 @@ export const updateEvent = async (event) => {
 export const removeEvent = async (eventId) => {
     const transaction = createTransaction([EVENTS_STORE_NAME, TASKS_STORE_NAME], 'readwrite')
     try {
+        // Удаляем все связанные с мероприятием задачи
         const tasksStore = transaction.objectStore(TASKS_STORE_NAME)
         const tasks = await tasksStore.getAll()
         for (const task of tasks) {
@@ -61,9 +64,17 @@ export const removeEvent = async (eventId) => {
             }
         }
 
+        // Удаляем связь с глобальным мероприятием
         const eventsStore = transaction.objectStore(EVENTS_STORE_NAME)
-        await eventsStore.delete(eventId)
+        const events = eventsStore.getAll()
+        for (const event of events) {
+            if (event.globalEventId === eventId) {
+                event.globalEventId = undefined
+                await eventsStore.put(event)
+            }
+        }
 
+        await eventsStore.delete(eventId)
         transaction.commit()
         return new Response(JSON.stringify(eventId), { status: 201 })
     }

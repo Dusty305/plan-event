@@ -1,5 +1,5 @@
 const DB_NAME = 'planevent-db'
-const VERSION = 3
+const VERSION = 4
 export const EVENTS_STORE_NAME = 'events'
 export const TASKS_STORE_NAME = 'tasks'
 
@@ -7,13 +7,13 @@ let db = null
 const request = self.indexedDB.open(DB_NAME, VERSION)
 
 request.onerror = (event) => {
-    console.log('Could not open db', event)
+    console.log('DB. Could not open db: ', event)
 }
 
 request.onsuccess = (event) => {
     db = event.target.result
     db.onerror = (event) => {
-        console.log('DB error:', event.target)
+        console.log('DB error: ', event.target)
     }
 }
 
@@ -58,6 +58,7 @@ const createObjectStore = (transaction, storeName) => {
     })
 }
 
+// Создаёт транзакцию, которая оборачивает функционал ObjectStore в промисы
 export const createTransaction = (storeNames, mode) => {
     throwIfDBNonExistent()
     const transaction = db.transaction(storeNames, mode)
