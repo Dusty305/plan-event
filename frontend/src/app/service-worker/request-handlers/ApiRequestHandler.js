@@ -16,6 +16,7 @@ export class ApiRequestHandler extends RequestHandler {
             return await super.handleRequest()
         } catch (e) {
             this._prepareUrlSegments()
+            await this._prepareRequestBody()
             const requestHandlerPromise = this._deduceApiHandler()
             return await requestHandlerPromise
         }
@@ -25,6 +26,17 @@ export class ApiRequestHandler extends RequestHandler {
         const url = new URL(this._request.url)
         this._urlSegments = url.pathname.split('/').slice(1)
         return this._urlSegments
+    }
+
+    async _prepareRequestBody() {
+        try {
+            this._requestBody = await this._request.clone().json()
+            return this._requestBody
+        } catch (e) {
+            this._requestBody = {}
+            return this._requestBody
+        }
+
     }
 
     _deduceApiHandler() {
@@ -41,17 +53,17 @@ export class ApiRequestHandler extends RequestHandler {
             case undefined:
                 return getAllEvents();
             case 'save_event':
-                return addEvent(this.requestBody)
+                return addEvent(this._requestBody)
             case 'update_event':
-                return updateEvent(this.requestBody)
+                return updateEvent(this._requestBody)
             case 'remove_event':
-                return removeEvent(this.requestBody)
+                return removeEvent(this._requestBody)
             case 'save_task':
-                return addTask(this.requestBody)
+                return addTask(this._requestBody)
             case 'update_task':
-                return updateTask(this.requestBody)
+                return updateTask(this._requestBody)
             case 'remove_task':
-                return removeTask(this.requestBody)
+                return removeTask(this._requestBody)
             default:
                 throw new NotImplementedError('API is not defined for ' + this.url.pathname);
         }

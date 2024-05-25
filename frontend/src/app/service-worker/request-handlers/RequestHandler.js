@@ -4,6 +4,6 @@ export class RequestHandler {
     }
 
     async handleRequest() {
-        return fetch(this._request)
+        return fetch(this._request.clone())
     }
 }

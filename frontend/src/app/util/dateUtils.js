@@ -2,8 +2,18 @@
 //
 // Date to string
 //
+const months = [
+    'янв', 'фев', 'мар', 'апр', 'май', 'июн',
+    'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'
+];
 export const dateToWeekString = (date) => {
-    return date.getFullYear() + ', ' + Math.ceil(date.getDay() / 7).toString() + ' неделея'
+    return date.getFullYear() + ', ' + Math.ceil(date.getDay() / 7).toString() + ' неделя'
+}
+export const dateToMonthDayString = (date) => {
+    const monthIndex = date.getMonth();
+    const day = date.getDate();
+    const month = months[monthIndex];
+    return `${month} ${day}`;
 }
 export const dateToMonthString = (date) => {
     let options = { month: 'short' }
@@ -15,6 +25,8 @@ export const dateToMonthString = (date) => {
 export const dateToYearString = (date) => {
     return date.toLocaleDateString('ru', { year: 'numeric' })
 }
+
+
 
 //
 // Increment/decrement date by week/month/year

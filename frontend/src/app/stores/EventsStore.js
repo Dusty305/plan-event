@@ -96,7 +96,7 @@ export const useEventsStore = defineStore("events", () => {
             if (response.ok) {
                 const rawEvents = await response.json()
                 events.value = rawEvents.map(_objToEvent)
-                console.log(events.value)
+                console.log('Refreshed events: ', events)
             }
         } catch (e) {
             console.log('Error refreshing events - ', e)
@@ -267,7 +267,7 @@ export const useEventsStore = defineStore("events", () => {
     })
 
     return {
-        events: computed(() => events.value.map(event => event)),
+        events,
         refreshEvents, refreshing,
         saveEvent, updateEvent, removeEvent,
         saveTask, updateTask, removeTask,

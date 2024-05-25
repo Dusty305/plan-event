@@ -21,6 +21,10 @@ export const useAppStore = defineStore('app', () => {
         sidebar.value = false
     }
 
+    const openEditEventDialog = (event, newEvent) => {
+
+    }
+
     return {
         sidebar: sidebar,
         sidebarEvent: sidebarEvent,
